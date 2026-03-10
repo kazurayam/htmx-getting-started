@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "strict": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "types": ["bun-types"],
+    "lib": ["DOM", "ESNext"],
+    "skipDefaultLibCheck": true
   }
 }

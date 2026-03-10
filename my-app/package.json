@@ -1,5 +1,7 @@
 {
-  "name": "my-app",
+  "name": "htmx-jsx-hono-bun_my-app",
+  "module": "src/index",
+  "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts"
   },
@@ -7,6 +9,10 @@
     "hono": "^4.12.5"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^20.6.1",
     "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
   }
 }
