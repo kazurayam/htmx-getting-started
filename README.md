@@ -1,4 +1,9 @@
-# htmx-getting-started-with
-htmxを触ってみる
+# htmx getting started with
 
-- [gihyo.jp HTMLを拡張し⁠⁠、JSなしで動的UIを作る「htmx」](https://gihyo.jp/article/2026/02/htmx-introduction)
+[htmx](https://gihyo.jp/article/2026/02/htmx-introduction)に触ってみるためにこのプロジェクトを作った。
+
+```
+$ cd html-getting-started-with
+$ bun create hono@latest
+
+```
