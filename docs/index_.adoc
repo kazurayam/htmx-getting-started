@@ -4,15 +4,15 @@
 
 わたしは静的HTMLだけでできた旧式なwebサイトの管理運用を職務上担当している。現代的なソフトウェア開発技法を用いてそのサイトを実装し直したいと企んでいる。
 
-所与の条件がある
+いくつか条件がある
 
 1. TypeScript言語を使う
 2. Node + npm + npxではなくbunを使う
 3. ExpressではなくHonoを使う
-4. クライアント・サイドをできるだけ軽量にしたい。そのためwebページを実装するのにReactではなく、HonoのJSXを使ってサーバー・サイドでレンダリングする(SSR)をおもに使う
-5. ブラウザからお知らせ記事を投稿してサイトに追加するためのUIを実現したい。これをSSRだけで実現するのは無理だ。
+4. クライアント・サイドをできるだけ軽量にしたい。そのためwebページを実装するのにReactではなくHonoのJSXを使ってサーバー・サイド・レンダリング(SSR)する
+5. お知らせ記事をブラウザから投稿してサイトのコンテンツとして追加したい。そのためのUIを実現したい。
 
-会話的なWeb UIを実装するためにReactを使うしかないのかなと思っていた。そのノウハウを教えてくれる本も読んだ。しかしわたしはReactに気乗りがしなかった。わたしが目標とするwebサイトにReactはあまり適合的でなかった。もっと軽い方法はないものか？と迷っていた。そうこうするうち２０２６年３月、Web記事 link:https://gihyo.jp/article/2026/02/htmx-introduction[gihyo.jp 「HTMLを拡張し⁠⁠、JSなしで動的UIを作るhtmx」, 嶌田喬行（しまだたかゆき）] を読んだ。この記事の冒頭にhtmxを使ったwebページのサンプルが紹介されていた。
+記事投稿のUIをSSRだけで実現するのは無理だ。Reactを使うしかないのかなと思い、そのノウハウを教えてくれる本を読んで学んだ。しかしわたしはReactに気乗りがしなかった。わたしが目標とする小さなwebサイトにReactは適合的でないと思った。もっと軽い方法はないものか？と迷っていた。そうこうするうち２０２６年３月、Web記事 link:https://gihyo.jp/article/2026/02/htmx-introduction[gihyo.jp 「HTMLを拡張し⁠⁠、JSなしで動的UIを作るhtmx」, 嶌田喬行（しまだたかゆき）] を読んだ。この記事の冒頭にhtmxを使ったwebページのサンプルが紹介されていた。
 
 [source,html]
 ----
@@ -26,31 +26,35 @@
 
 image::https://gihyo.jp/assets/images/article/2026/02/htmx-introduction/hello.gif[]
 
-よおし、htmxをもっと学ぼうとわたしの気分は高まったが、すぐ課題が一つあることに気づいた。
+よおし、htmxをもっと学ぼうとわたしの気分は高まったが、すぐ一つ課題があることに気づいた。ブラウザ画面上に表示されたボタンを人がマウスでクリックすると「こんにちは」と表示されるのだが、この動きテストしたい。そのテストをコード化して自動化したい。だから
 
 *htmxで作ったHTTPサーバアプリケーションをPlaywrightを使ってE2Eテストしたい、ただしbunとHonoとJSXにhtmxを組み合わせるという条件のもとで。*
 
-こういう課題の解決方法を教えてくれるWeb記事を探したけれど見当たらなかった。しょうがない、ネットから情報を集めて動くコード一式を自作しよう。
+こういう課題の解決方法を教えてくれるWeb記事を探したが見当たらなかった。しょうがない。動くコード一式を自作しよう。
 
 == 解決すべき問題
 
-Playwrightはbunの上ではまともに動かない、PlaywrightはNodeを前提しているから、という記事があった。
+「Playwrightはbunの上ではまともに動かない、PlaywrightはNodeを前提しているから」と述べる記事があった。
 
 - link:https://www.browserstack.com/guide/bun-playwright[browserstack, How to Use Bun for Playwright Tests]
 
-本当にそうなのか？と私はPlaywrightのサンプルコードを打ち込んでbunの上で試してみた。たしかに動かなかった。エラーメッセージが表示されるが、それを読んでも何がどう悪いのかよく分からなかった。手に負えない感じだった。困った。
+本当にそうなのか？わたしはPlaywrightのサンプルコードを打ち込んでbunの上で試してみた。たしかに動かなかった。よくわからないエラーメッセージが表示されて、わたしには手に負えない感じだった。困った。
 
 == 解決方法
 
 "bun playwright"をキーにググったら別のweb記事を見つけた。
 
-- [Running playwright on fly.io with bun, Stephen Haney](https://stephenhaney.com/2024/playwright-on-fly-io-with-bun/)
+- link:https://stephenhaney.com/2024/playwright-on-fly-io-with-bun/[Running playwright on fly.io with bun, Stephen Haney]
 
-この記事はテストを実行するのに`npx playwright test`コマンドを使わない。TypeScriptコード `src/main.ts` を書く。`main.ts` は `playwright-chromium` というJavaScriptライブラリをimportする。そして`bun run src/main.ts` というコマンドで実行する。
+この記事はテストを実行するのに `npx playwright test` コマンドを使わない。TypeScriptコード `src/main.ts` を書く。その `main.ts` は `playwright-chromium` というJavaScriptライブラリをimportする。そして`bun run src/main.ts` というコマンドで実行する。
 
-`playwright-chromium`ライブラリはPlaywrightプロジェクトが開発したものだ。これを使えばJest流の単体テストがアダプタ層を介してChromiumブラウザを立ち上げ、URLをGETし、応答によってできたDOMをアクセスできるようにしてくれる。Playwrightの入門記事を読むと `npx playwright test` コマンドを使えと書いてある。それが王道だ。だがさておくとしよう。Playwrightプロジェクトの成果物をimportして利用するという裏口入学もアリなのだ。この記事はその方法を示している。
+一方Playwrightの入門記事を読むと `npx playwright test` コマンドを使えと書いてある。たとえば
 
-Browserstackの記事が言うようにPlaywrightプロジェクトがNode依存なところがあるという説はたぶん正しい。しかし `playwright-chromium` ライブラリはNode依存ではなくて、bunの上でもちゃんと動作するんじゃなかろうか。試してみる価値があると思う。
+- link:https://playwright.dev/docs/running-tests[Playwright, Getting Started, Running and debugging tests]
+
+Stephen HaneyはPlaywrightの正面玄関ではなく裏口を教えてくれている。`playwright-chromium` ライブラリはPlaywrightプロジェクトが開発したものだ。これを使えばJest流の単体テストがアダプタ層を介してChromiumブラウザを立ち上げ、ブラウザにURLをGETさせて、応答画面のDOMにアクセスできるようにしてくれる。
+
+Browserstackの記事が言うようにPlaywrightプロジェクトがNode依存なところがあるという説はたぶん正しい。しかし `playwright-chromium` ライブラリはたぶんNode依存ではなくて、bunの上でもちゃんと動作するんじゃなかろうか。試してみる価値があると思う。
 
 == 説明
 
