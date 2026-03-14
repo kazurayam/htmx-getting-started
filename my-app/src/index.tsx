@@ -1,4 +1,4 @@
-// src/starter.tsx
+// src/index.tsx
 import { Hono } from 'hono'
 import type { FC } from 'hono/jsx'
 

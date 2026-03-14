@@ -1,8 +1,10 @@
-import { chromium } from 'playwright-chromium';
-
+// src/main.ts
 /**
  * https://stephenhaney.com/2024/playwright-on-fly-io-with-bun/
  */
+
+import { chromium } from 'playwright-chromium';
+
 async function main() {
     // Launch the browser
     const browser = await chromium.launch();
